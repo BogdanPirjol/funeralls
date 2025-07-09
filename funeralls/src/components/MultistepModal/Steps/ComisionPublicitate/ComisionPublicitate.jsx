@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { FiPercent } from "react-icons/fi";
-/* import {
-  editareComisionPublicitate,
-  useData,
-  useDispatch,
-} from "../../../ContractEditor"; */
+
 import ButoaneControl from "../UI/ButoaneControl";
 import { editareComisionPublicitate, useData, useDispatch } from "../../../../Context/reducer";
 

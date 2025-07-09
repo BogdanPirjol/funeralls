@@ -40,11 +40,9 @@ export default function Intermediar() {
     }
   }, [editareReprezentant?.isEditing, editareReprezentant?.index]);
 
-  useEffect(() => {
-    console.log({ beneficiarData });
-  }, [beneficiarData]);
-
-  console.log({ beneficiarData });
+  useEffect(()=> {
+    console.log(dateReprezentant);
+  }, [dateReprezentant])
 
   return (
     <div>

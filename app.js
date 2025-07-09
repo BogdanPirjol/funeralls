@@ -1,39 +1,39 @@
-const express = require('express');
-const puppeteer = require('puppeteer')
-const cors = require('cors')
-const moment = require('moment');
+const express = require("express");
+const puppeteer = require("puppeteer");
+const cors = require("cors");
+const moment = require("moment");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.post('/anaf', async (req, res) => {
+app.post("/anaf", async (req, res) => {
   const cui = req.body.cui;
   const reqBody = {};
 
   reqBody.cui = cui;
-  reqBody.data = moment().format('YYYY-MM-DD').toString();
+  reqBody.data = moment().format("YYYY-MM-DD").toString();
 
   const options = {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify([
-      reqBody
-    ])
-  }
+    body: JSON.stringify([reqBody]),
+  };
 
   try {
-    const response = await fetch('https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva', options)
+    const response = await fetch(
+      "https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva",
+      options
+    );
 
     const reader = response.body.getReader();
     const chunks = [];
 
     while (1) {
       const { done, value } = await reader.read();
-      if (done)
-        break;
+      if (done) break;
       chunks.push(value);
     }
 
@@ -46,46 +46,79 @@ app.post('/anaf', async (req, res) => {
       return res.status(200).json({
         success: true,
         data: jsonData.found,
-        message: 'data founded'
+        message: "data founded",
       });
     }
-    throw Error('Data not found for requested CUI!');
+    throw Error("Data not found for requested CUI!");
   } catch (err) {
     return res.status(500).json({
       success: false,
       data: null,
-      message: err.message
-    })
+      message: err.message,
+    });
   }
-})
+});
 
 function renderReprezentantiLegal(repLegArr) {
-  return repLegArr.map((repLegal, index, arr) => {
-    return `
-      <div class="flex flex-col">
-        <span>${repLegal.titulatura} ${repLegal.nume}</span>
-        <span>în calitate de: ${repLegal.calitate}</span>
-        <span>identificat(ă) prin: CI seria ${repLegal.serie} număr ${repLegal.numar}</span>
-        <span>Telefon ${repLegal.telefon || "—"} email ${repLegal.email || "—"}</span>
-        <span>identificat(ă) prin: CNP ${repLegal.CNP}</span>
-      </div>
-      ${index + 1 < arr.length ? `<div class="flex self-start"><span>și</span></div>` : ""}
-    `;
-  }).join("");
+  return repLegArr
+    ?.map((repLegal, index, arr) => {
+      return `<span>reprezentata legal de </span>
+          <div class="flex flex-col items-end">
+            <div class="flex flex-col">
+              <span>
+                ${repLegal.titulatura} ${repLegal.nume}
+              </span>
+              <span>în calitate de: ${repLegal.calitate}</span>
+              <span>
+                identificat(ă) prin: ${repLegal.tipDoc || "-"} seria
+                ${repLegal.serie || "-"} numar ${repLegal.numar}
+              </span>
+              <span>
+                Telefon ${repLegal.telefon || "-"} email ${
+        repLegal.email || "-"
+      }
+              </span>
+              <span>identificat(ă) prin: CNP ${repLegal.CNP}</span>
+            </div>
+            ${
+              index + 1 < arr.length
+                ? `<div class="flex self-start">
+                  <span>și</span>
+                </div>`
+                : ""
+            }
+          </div>`;
+    })
+    .join("");
 }
-app.post('/generate-pdf', async (req, res) => {
 
+function renderProduseSiServicii(produseSiServicii) {
+  return produseSiServicii
+    ?.map((item) => {
+      return `
+          <div class="flex gap-x-2">
+            <span>-</span>
+            <span>${item.denumire}</span>
+            <span>${item.descriere}</span>
+          </div>
+      `;
+    })
+    .join("");
+}
 
-  const { beneficiar,
+app.post("/generate-pdf", async (req, res) => {
+  const {
+    beneficiar,
     reprezentantLegal,
     comisionIntermediar,
     produseSiServicii,
     termenOnorareContract,
-    procentPlatforma,
+    comisionPlatforma,
     comisionPublicitate,
     durataContract,
     termenIncasareComision,
-    pretSiModalitatiDePlata, } = req.body;
+    pretSiModalitatiDePlata,
+  } = req.body;
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -129,26 +162,26 @@ app.post('/generate-pdf', async (req, res) => {
           </div>
           <div class="flex flex-col">
             <span class="font-semibold">
-              Societatea ${beneficiar.societate || '-'},
+              Societatea ${beneficiar.societate || "-"},
             </span>
             <span class="font-semibold">
               Sediul ${beneficiar.sediu || "-"},
             </span>
             <span class="font-semibold">
               Înmatriculare la Oficiul Registrul Comertului
-              ${beneficiar["Inmatriculare la Registrul Comertului"] || '-'},
+              ${beneficiar["Inmatriculare la Registrul Comertului"] || "-"},
             </span>
             <span class="font-semibold">
               Cod Unic de Înregistrare/Cod Fiscal ${beneficiar.CUI || "-"},
             </span>
             <span class="font-semibold">
-              Cont bancar nr. ${beneficiar["Cont Bancar"] || '-'},
+              Cont bancar nr. ${beneficiar["Cont Bancar"] || "-"},
             </span>
             <span class="font-semibold">
               Banca ${beneficiar.banca || "-"},
             </span>
             <span class="font-semibold">
-              Sucursala ${beneficiar.sucursala || '-'},
+              Sucursala ${beneficiar.sucursala || "-"},
             </span>
             <span class="font-semibold">
               Telefon ${beneficiar.telefon || "-"},
@@ -156,10 +189,7 @@ app.post('/generate-pdf', async (req, res) => {
             <span class="font-semibold">
               email ${beneficiar.email || "-"},
             </span>
-            <span>reprezentata legal de </span>
-            <div class="flex flex-col items-end">
-              ${renderReprezentantiLegal(reprezentantLegal)}
-            </div>
+            ${renderReprezentantiLegal(reprezentantLegal)}
             <span class="pt-5">
               în calitate de <b class="uppercase">intermediar</b>, denumită
               în continuare în prezentul contract <b>Intermediar</b>, și
@@ -174,35 +204,34 @@ app.post('/generate-pdf', async (req, res) => {
           </div>
           <div class="flex flex-col">
             <span class="font-semibold">
-              Societatea ${beneficiar.societate || '-'},
+              Societatea ${beneficiar.societate || "-"},
             </span>
-            <span class="font-semibold">Sediul ${beneficiar.sediu || '-'},</span>
+            <span class="font-semibold">Sediul ${
+              beneficiar.sediu || "-"
+            },</span>
             <span class="font-semibold">
               Înmatriculare la Oficiul Registrul Comertului
-              ${beneficiar["Inmatriculare la Registrul Comertului"] || '-'},
+              ${beneficiar["Inmatriculare la Registrul Comertului"] || "-"},
             </span>
             <span class="font-semibold">
-              Cod Unic de Înregistrare/Cod Fiscal ${beneficiar.CUI || '-'},
+              Cod Unic de Înregistrare/Cod Fiscal ${beneficiar.CUI || "-"},
             </span>
             <span class="font-semibold">
-              Cont bancar nr. ${beneficiar["Cont Bancar"] || '-'},
+              Cont bancar nr. ${beneficiar["Cont Bancar"] || "-"},
             </span>
             <span class="font-semibold">
-              Banca ${beneficiar.banca || '-'},
+              Banca ${beneficiar.banca || "-"},
             </span>
             <span class="font-semibold">
-              Sucursala ${beneficiar.sucursala || '-'},
+              Sucursala ${beneficiar.sucursala || "-"},
             </span>
             <span class="font-semibold">
-              Telefon ${beneficiar.telefon || '-'},
+              Telefon ${beneficiar.telefon || "-"},
             </span>
             <span class="font-semibold">
-              email ${beneficiar.email || '-'},
+              email ${beneficiar.email || "-"},
             </span>
-            <span>reprezentata legal de </span>
-            <div class="flex flex-col items-end">
-              ${renderReprezentantiLegal(reprezentantLegal)}
-            </div>
+            ${renderReprezentantiLegal(reprezentantLegal)}
             <span class="pt-5">
               în calitate de <b class="uppercase">beneficiar</b>, denumită
               în continuare în prezentul contract <b>Beneficiar</b>, având ca
@@ -343,9 +372,11 @@ app.post('/generate-pdf', async (req, res) => {
                 Intermediarul este îndreptățit ca la fiecare vânzare de servicii
                 sau produse de către Beneficiar să solicite și să primească un
                 comision în valoare de
-                ${comisionIntermediar?.valoare
-      ? `${comisionIntermediar?.value} %`
-      : "_____% "}
+                ${
+                  comisionIntermediar?.value
+                    ? `${comisionIntermediar?.value} %`
+                    : "_____% "
+                }
                 din valoarea totală a Contractului pe care Beneficiarul în
                 remite cumpărătorului.
               </span>
@@ -456,8 +487,10 @@ app.post('/generate-pdf', async (req, res) => {
               <span>
                 Intermediarul se obligă să acorde exclusivitate Beneficiarului
                 în Teritoriul contractual numai în ceea ce privește
-                intermedierea vânzării următoarelor produse și servicii
-                :_______________________;
+                intermedierea vânzării următoarelor produse și servicii:
+                <div class="flex flex-col">
+                    ${renderProduseSiServicii(produseSiServicii)}
+                  </div>
               </span>
             </div>
           </div>
@@ -557,10 +590,12 @@ app.post('/generate-pdf', async (req, res) => {
                 </p>
                 insoțit de factura corespunzătoare. Beneficiarul se obligă să
                 onoreze comanda în termenul asumat prin contract de
-                ${termenOnorareContract?.cantitate &&
-      termenOnorareContract?.unitateDeMasura
-      ? `${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`
-      : `${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`}
+                ${
+                  termenOnorareContract?.cantitate &&
+                  termenOnorareContract?.unitateDeMasura
+                    ? `${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`
+                    : `${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`
+                }
                 de la ora si data la care i-a fost solicitata de client.
                 Onorarea comenzii se face prin livrarea bunurilor la punctul de
                 destinatie indicat de client, în cantitatea stabilită, însoțită
@@ -614,10 +649,12 @@ app.post('/generate-pdf', async (req, res) => {
               <span>
                 Comisionul tranzactiilor efectuate prin intermediul platoformei
                 www.funeralls.com intre Intermediar si Beneficiar este de
-                ${procentPlatforma
-      ? `${procentPlatforma} %<i>(procent in litere)</i>`
-      : `______
-                (procentul in litere) %`}
+                ${
+                  comisionPlatforma?.value
+                    ? `${comisionPlatforma.value}`
+                    : `______`
+                }
+                     <i>(procent in litere)%</i>
                 din valoarea facturilor emise, aparte de abanamentul
                 achizitionat.
               </span>
@@ -648,11 +685,13 @@ app.post('/generate-pdf', async (req, res) => {
               publicitate pe piețele din Teritoriul contractual, atât în ce
               privește formele, cât și cheltuielile de publicitate, dacă este
               cazul. Beneficiarul se obliga sa plateasca lunar
-              ${comisionPublicitate?.tip && comisionPublicitate?.valoare
-      ? comisionPublicitate.tip === "suma fixa"
-        ? `suma de ${comisionPublicitate?.valoare} (RON).`
-        : `un procent de ${comisionPublicitate?.valoare} %.`
-      : "(un procent din vanzari/suma fixa)."}
+              ${
+                comisionPublicitate?.tip && comisionPublicitate?.valoare
+                  ? comisionPublicitate.tip === "suma fixa"
+                    ? `suma de ${comisionPublicitate?.valoare} (RON).`
+                    : `un procent de ${comisionPublicitate?.valoare} %.`
+                  : "(un procent din vanzari/suma fixa)."
+              }
             </span>
           </div>
         </div>
@@ -783,21 +822,27 @@ app.post('/generate-pdf', async (req, res) => {
           <div>
             <span>
               Prezentul contract se încheie începând cu data de
-              ${durataContract?.dataStart
-      ? `${durataContract?.dataStart}`
-      : `___/___/______
-              (se va trece data in sistem german și anume zz/ll/aaaa) `}
+              ${
+                durataContract?.dataStart
+                  ? `${durataContract?.dataStart}`
+                  : `___/___/______
+              (se va trece data in sistem german și anume zz/ll/aaaa) `
+              }
               și se desfășoară până la data de
-              ${durataContract?.dataFinal
-      ? durataContract?.dataFinal
-      : ` ___/___/______`}
+              ${
+                durataContract?.dataFinal
+                  ? durataContract?.dataFinal
+                  : ` ___/___/______`
+              }
               (se va trece data in sistem german și anume zz/ll/aaaa). Cu 30
               zile lucrătoare înainte de expirarea valabilități prezentului
               contract, părțile vor decide în scris asupra prelungirii sale cu
               încă
-              ${durataContract?.prelungire
-      ? `${durataContract?.prelungire?.quantity} ${durataContract?.prelungire?.unitOfMeasure}`
-      : `_______ (se vor trece, conform înțelegerii, zile, luni, ani)`}
+              ${
+                durataContract?.prelungire
+                  ? `${durataContract?.prelungire?.cantitate} ${durataContract?.prelungire?.unitateDeMasura}`
+                  : `_______ (se vor trece, conform înțelegerii, zile, luni, ani)`
+              }
               .
             </span>
           </div>
@@ -920,9 +965,11 @@ app.post('/generate-pdf', async (req, res) => {
                 </b>
                 . În acest caz, Intermediarul va beneficia de un comision
                 reprezentând
-                ${pretSiModalitatiDePlata?.tipGarantie === "garantie-solida"
-      ? `${pretSiModalitatiDePlata?.valoarePret} %`
-      : `_______%`}
+                ${
+                  pretSiModalitatiDePlata?.tipGarantie === "garantie-solida"
+                    ? `${pretSiModalitatiDePlata?.valoarePret} %`
+                    : `_______%`
+                }
                 din valoarea totală a tranzacției;
               </span>
             </div>
@@ -947,9 +994,11 @@ app.post('/generate-pdf', async (req, res) => {
                 </b>
                 . În acest caz, Intermediarul va beneficia de un comision
                 reprezentând
-                ${pretSiModalitatiDePlata?.tipGarantie === "negarantat"
-      ? `${pretSiModalitatiDePlata?.valoarePret} %`
-      : `_______%`}
+                ${
+                  pretSiModalitatiDePlata?.tipGarantie === "negarantat"
+                    ? `${pretSiModalitatiDePlata?.valoarePret} %`
+                    : `_______%`
+                }
                 din valoarea totală a tranzacției;
               </span>
             </div>
@@ -969,9 +1018,11 @@ app.post('/generate-pdf', async (req, res) => {
               </div>
               <span>
                 alt mod de dobândire a comisionul convenit de către părți:
-                ${pretSiModalitatiDePlata?.tipGarantie === "custom"
-      ? pretSiModalitatiDePlata?.valoarePret
-      : ` _______________________`}
+                ${
+                  pretSiModalitatiDePlata?.tipGarantie === "custom"
+                    ? pretSiModalitatiDePlata?.valoarePret
+                    : ` _______________________`
+                }
               </span>
             </div>
           </div>
@@ -1020,9 +1071,11 @@ app.post('/generate-pdf', async (req, res) => {
                 </svg>
               </div>
               <span>
-                ${pretSiModalitatiDePlata?.modalitatePlata === "altfel"
-      ? `${pretSiModalitatiDePlata?.valoarePlata}`
-      : `altfel:_________________________________________________________`}
+                ${
+                  pretSiModalitatiDePlata?.modalitatePlata === "altfel"
+                    ? `${pretSiModalitatiDePlata?.valoarePlata}`
+                    : `altfel:_________________________________________________________`
+                }
               </span>
             </div>
           </div>
@@ -2103,38 +2156,39 @@ app.post('/generate-pdf', async (req, res) => {
     </div>
   </body>
 </html>
-  `
-  await page.setContent(html, { waitUntil: 'networkidle0' });
+  `;
+  await page.setContent(html, { waitUntil: "networkidle0" });
 
   const pdf = await page.pdf({
-    format: 'A4',
+    format: "A4",
     printBackground: true,
     margin: {
-      top: '20mm',
-      bottom: '20mm',
-      left: '15mm',
-      right: '15mm'
+      top: "20mm",
+      bottom: "20mm",
+      left: "15mm",
+      right: "15mm",
     },
     displayHeaderFooter: true,
     footerTemplate: `
     <div style="font-size:14px; width:100%; text-align:center; color: black; padding-bottom:5px; font-family: 'Times New Roman', serif;">
       <span class="pageNumber"></span> 
     </div>
-  `, headerTemplate: `<div></div>`
+  `,
+    headerTemplate: `<div></div>`,
   });
 
   await browser.close();
 
   res.set({
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': 'attachment; filename=raport.pdf',
+    "Content-Type": "application/pdf",
+    "Content-Disposition": "attachment; filename=raport.pdf",
   });
 
-  console.log(pdf)
+  console.log(pdf);
 
   res.send(pdf);
 });
 
 app.listen(8080, () => {
-  console.log('Server listening on port 8080...');
-})
+  console.log("Server listening on port 8080...");
+});

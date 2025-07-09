@@ -10,8 +10,8 @@ export default function ContractPreview() {
     comisionIntermediar,
     produseSiServicii,
     termenOnorareContract,
-    procentPlatforma,
     comisionPublicitate,
+    comisionPlatforma,
     durataContract,
     termenIncasareComision,
     pretSiModalitatiDePlata,
@@ -21,26 +21,41 @@ export default function ContractPreview() {
     return repLegArr.map((repLegal, index, arr) => {
       return (
         <>
-          <div className="flex flex-col">
-            <span>
-              {repLegal.titulatura} {repLegal.nume}
-            </span>
-            <span>în calitate de: {repLegal.calitate}</span>
-            <span>
-              identificat(ă) prin: {repLegal.tipDoc || "-"} seria{" "}
-              {repLegal.serie || "-"} numar {repLegal.numar}
-            </span>
-            <span>
-              Telefon {repLegal.telefon || "-"} email {repLegal.email || "-"}
-            </span>
-            <span>identificat(ă) prin: CNP {repLegal.CNP}</span>
-          </div>
-          {index + 1 < arr.length && (
-            <div className="flex self-start">
-              <span>și</span>
+          <span>reprezentata legal de </span>
+          <div className="flex flex-col items-end">
+            <div className="flex flex-col">
+              <span>
+                {repLegal.titulatura} {repLegal.nume}
+              </span>
+              <span>în calitate de: {repLegal.calitate}</span>
+              <span>
+                identificat(ă) prin: {repLegal.tipDoc || "-"} seria{" "}
+                {repLegal.serie || "-"} numar {repLegal.numar}
+              </span>
+              <span>
+                Telefon {repLegal.telefon || "-"} email {repLegal.email || "-"}
+              </span>
+              <span>identificat(ă) prin: CNP {repLegal.CNP}</span>
             </div>
-          )}
+            {index + 1 < arr.length && (
+              <div className="flex self-start">
+                <span>și</span>
+              </div>
+            )}
+          </div>
         </>
+      );
+    });
+  }
+
+  function renderProduseSiServicii(produseSiServicii) {
+    return produseSiServicii?.map((item) => {
+      return (
+        <div className="flex gap-x-2">
+          <span>-</span>
+          <span>{item.denumire}</span>
+          <span>{item.descriere}</span>
+        </div>
       );
     });
   }
@@ -77,26 +92,26 @@ export default function ContractPreview() {
           </div>
           <div className="flex flex-col">
             <span className="font-semibold">
-              Societatea {beneficiar.societate},
+              Societatea {beneficiar.societate || "-"},
             </span>
             <span className="font-semibold">
               Sediul {beneficiar.sediu || "-"},
             </span>
             <span className="font-semibold">
               Înmatriculare la Oficiul Registrul Comertului{" "}
-              {beneficiar["Inmatriculare la Registrul Comertului"]},
+              {beneficiar["Inmatriculare la Registrul Comertului"] || "-"},
             </span>
             <span className="font-semibold">
               Cod Unic de Înregistrare/Cod Fiscal {beneficiar.CUI || "-"},
             </span>
             <span className="font-semibold">
-              Cont bancar nr. {beneficiar["Cont Bancar"]},
+              Cont bancar nr. {beneficiar["Cont Bancar"] || "-"},
             </span>
             <span className="font-semibold">
               Banca {beneficiar.banca || "-"},
             </span>
             <span className="font-semibold">
-              Sucursala {beneficiar.sucursala},
+              Sucursala {beneficiar.sucursala || "-"},
             </span>
             <span className="font-semibold">
               Telefon {beneficiar.telefon || "-"},
@@ -104,10 +119,7 @@ export default function ContractPreview() {
             <span className="font-semibold">
               email {beneficiar.email || "-"},
             </span>
-            <span>reprezentata legal de </span>
-            <div className="flex flex-col items-end">
-              {renderReprezentantiLegal(reprezentantLegal)}
-            </div>
+            {renderReprezentantiLegal(reprezentantLegal)}
             <span className="pt-5">
               în calitate de <b className="uppercase">intermediar</b>, denumită
               în continuare în prezentul contract <b>Intermediar</b>, și
@@ -118,39 +130,23 @@ export default function ContractPreview() {
         {/* beneficiar */}
         <div className="flex gap-x-8 ">
           <div>
-            <span>(1)</span>
+            <span>(2)</span>
           </div>
           <div className="flex flex-col">
+            <span className="font-semibold">Societatea -,</span>
+            <span className="font-semibold">Sediul -,</span>
             <span className="font-semibold">
-              Societatea {beneficiar.societate},
-            </span>
-            <span className="font-semibold">Sediul {beneficiar.sediu},</span>
-            <span className="font-semibold">
-              Înmatriculare la Oficiul Registrul Comertului{" "}
-              {beneficiar["Inmatriculare la Registrul Comertului"]},
+              Înmatriculare la Oficiul Registrul Comertului -,
             </span>
             <span className="font-semibold">
-              Cod Unic de Înregistrare/Cod Fiscal {beneficiar.CUI || "="},
+              Cod Unic de Înregistrare/Cod Fiscal -,
             </span>
-            <span className="font-semibold">
-              Cont bancar nr. {beneficiar["Cont Bancar"]},
-            </span>
-            <span className="font-semibold">
-              Banca {beneficiar.banca || "="},
-            </span>
-            <span className="font-semibold">
-              Sucursala {beneficiar.sucursala},
-            </span>
-            <span className="font-semibold">
-              Telefon {beneficiar.telefon || "="},
-            </span>
-            <span className="font-semibold">
-              email {beneficiar.email || "="},
-            </span>
-            <span>reprezentata legal de </span>
-            <div className="flex flex-col items-end">
-              {renderReprezentantiLegal(reprezentantLegal)}
-            </div>
+            <span className="font-semibold">Cont bancar nr. -,</span>
+            <span className="font-semibold">Banca -,</span>
+            <span className="font-semibold">Sucursala -,</span>
+            <span className="font-semibold">Telefon -,</span>
+            <span className="font-semibold">email -,</span>
+            {/* {renderReprezentantiLegal(reprezentantLegal)} */}
             <span className="pt-5">
               în calitate de <b className="uppercase">beneficiar</b>, denumită
               în continuare în prezentul contract <b>Beneficiar</b>, având ca
@@ -291,8 +287,8 @@ export default function ContractPreview() {
                 Intermediarul este îndreptățit ca la fiecare vânzare de servicii
                 sau produse de către Beneficiar să solicite și să primească un
                 comision în valoare de{" "}
-                {comisionIntermediar.value
-                  ? `${comisionIntermediar?.value} %`
+                {comisionIntermediar?.value
+                  ? `${comisionIntermediar?.value}% `
                   : "_____% "}
                 din valoarea totală a Contractului pe care Beneficiarul în
                 remite cumpărătorului.
@@ -401,12 +397,16 @@ export default function ContractPreview() {
                   />
                 </svg>
               </div>
-              <span>
-                Intermediarul se obligă să acorde exclusivitate Beneficiarului
-                în Teritoriul contractual numai în ceea ce privește
-                intermedierea vânzării următoarelor produse și servicii
-                :_______________________;
-              </span>
+              <div className="flex flex-col">
+                <span>
+                  Intermediarul se obligă să acorde exclusivitate Beneficiarului
+                  în Teritoriul contractual numai în ceea ce privește
+                  intermedierea vânzării următoarelor produse și servicii:
+                  <div className="flex flex-col">
+                    {renderProduseSiServicii(produseSiServicii)}
+                  </div>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -508,7 +508,7 @@ export default function ContractPreview() {
                 {termenOnorareContract?.cantitate &&
                 termenOnorareContract?.unitateDeMasura
                   ? `${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`
-                  : "`${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`"}{" "}
+                  : `${termenOnorareContract?.cantitate} ${termenOnorareContract?.unitateDeMasura}`}{" "}
                 de la ora si data la care i-a fost solicitata de client.
                 Onorarea comenzii se face prin livrarea bunurilor la punctul de
                 destinatie indicat de client, în cantitatea stabilită, însoțită
@@ -562,12 +562,11 @@ export default function ContractPreview() {
               <span>
                 Comisionul tranzactiilor efectuate prin intermediul platoformei
                 www.funeralls.com intre Intermediar si Beneficiar este de{" "}
-                {procentPlatforma
-                  ? `${procentPlatforma} %<i>(procent in litere)</i>`
-                  : `______
-                (procentul in litere) %`}{" "}
-                din valoarea facturilor emise, aparte de abanamentul
-                achizitionat.
+                {comisionPlatforma?.value
+                  ? `${comisionPlatforma.value} `
+                  : `______`}
+                <i>(procentul in litere)</i>% din valoarea facturilor emise,
+                aparte de abanamentul achizitionat.
               </span>
             </div>
           </div>
@@ -744,7 +743,7 @@ export default function ContractPreview() {
               contract, părțile vor decide în scris asupra prelungirii sale cu
               încă{" "}
               {durataContract?.prelungire
-                ? `${durataContract?.prelungire?.quantity} ${durataContract?.prelungire?.unitOfMeasure}`
+                ? `${durataContract?.prelungire?.cantitate} ${durataContract?.prelungire?.unitateDeMasura}`
                 : `_______ (se vor trece, conform înțelegerii, zile, luni, ani)`}
               .
             </span>
@@ -1003,7 +1002,7 @@ export default function ContractPreview() {
               </span>
             </div>
             <div className="flex gap-x-2 items-start">
-             <div>
+              <div>
                 <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                   <rect
                     x="5"
@@ -1018,7 +1017,9 @@ export default function ContractPreview() {
               </div>
               <span>
                 în termen de{" "}
-                {termenIncasareComision ? termenIncasareComision : `______`}{" "}
+                {termenIncasareComision?.value
+                  ? termenIncasareComision.value
+                  : `______`}{" "}
                 zile calendaristice de la data încasării valorii totale a
                 facturii emise de către Beneficiar către client.
               </span>

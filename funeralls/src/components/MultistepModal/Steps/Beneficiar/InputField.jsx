@@ -15,12 +15,22 @@ export default function InputField({
           onChange={changeHandler}
           name={name}
           value={value}
-          className="col-start-2 col-span-1 bg-[#465a7e66] text-gray-100 py-1 rounded-md focus:ring-1 focus:ring-slate-400 focus:border-slate-400 focus-visible:outline-none cursor-pointer">
-          {options.map((option) => {
+          className="col-start-2 col-span-1 bg-[#465a7e66] text-gray-100 py-1 rounded-md focus:ring-1 focus:ring-slate-400 focus:border-slate-400 focus-visible:outline-none cursor-pointer"
+        >
+          {options.map((option, index) => {
             return option === "---" ? (
-              <option value="---" disabled className="hidden"></option>
+              <option
+                key={index}
+                value="---"
+                disabled
+                className="hidden"
+              ></option>
             ) : (
-              <option name={option} className="bg-slate-700 cursor-pointer">
+              <option
+                key={index}
+                name={option}
+                className="bg-slate-700 cursor-pointer"
+              >
                 {option}
               </option>
             );
@@ -32,7 +42,8 @@ export default function InputField({
           name={name}
           className="col-start-2 col-span-1 bg-[#465a7e66] text-gray-100 py-1 rounded-md focus:ring-1 focus:ring-slate-400 focus:border-slate-400 focus-visible:outline-none"
           value={value}
-          onChange={changeHandler}></input>
+          onChange={changeHandler}
+        ></input>
       )}
     </div>
   );

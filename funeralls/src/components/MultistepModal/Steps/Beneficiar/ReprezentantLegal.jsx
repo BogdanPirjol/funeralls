@@ -7,13 +7,6 @@ import {
   useData,
   useDispatch,
 } from "../../../../Context/reducer";
-/* import {
-  adaugaReprezentantLegal,
-  editeazaReprezentantLegal,
-  marcheazaEditareReprezentantLegal,
-  useData,
-  useDispatch,
-} from "../../../ContractEditor"; */
 
 export default function ReprezentantLegal({
   editedReprezentantLegal,
@@ -58,7 +51,8 @@ export default function ReprezentantLegal({
   const dispatch = useDispatch();
 
   function onChangeHandler(e) {
-    if (["indentificare", "titulatura"].includes(e.target.name))
+    console.log(e.target.name, e.target.value);
+    if (["identificare", "titulatura"].includes(e.target.name))
       return setReprezentantLegal((prev) => {
         return {
           ...prev,
@@ -154,19 +148,22 @@ export default function ReprezentantLegal({
           <div className="flex justify-center gap-x-4 w-full">
             <button
               onClick={handleSubmitChanges}
-              className="bg-slate-600/50 text-gray-100 py-2 px-4 rounded-md hover:bg-slate-600">
+              className="bg-slate-600/50 text-gray-100 py-2 px-4 rounded-md hover:bg-slate-600"
+            >
               Modifica Reprezentant Legal
             </button>
             <button
               onClick={handleDiscardChanges}
-              className="bg-red-600/80 text-gray-100 py-2 px-4 rounded-md hover:bg-red-600">
+              className="bg-red-600/80 text-gray-100 py-2 px-4 rounded-md hover:bg-red-600"
+            >
               Renunta la modifcari
             </button>
           </div>
         ) : (
           <button
             onClick={handleAddRepresentative}
-            className="bg-slate-600/50 text-gray-100 py-2 px-4 rounded-md hover:bg-slate-600">
+            className="bg-slate-600/50 text-gray-100 py-2 px-4 rounded-md hover:bg-slate-600"
+          >
             {" "}
             Adauga Reprezentant Legal
           </button>
