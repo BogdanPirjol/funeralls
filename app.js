@@ -2184,9 +2184,11 @@ app.post("/generate-pdf", async (req, res) => {
 
   await browser.close();
 
+  const currentDate = moment().format('DD_MMMM_YYYY_hh_mm_ss')
+ 
   res.set({
     "Content-Type": "application/pdf",
-    "Content-Disposition": "attachment; filename=raport.pdf",
+    "Content-Disposition": `attachment; filename=Contract_${currentDate}.pdf`,
   });
 
   console.log(pdf);
