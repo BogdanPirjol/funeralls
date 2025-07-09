@@ -12,5 +12,7 @@ mkdir -p "$PUPPETEER_CACHE_DIR"
 # Instalează Chrome
 npx puppeteer browsers install chrome
 
+mkdir -p ./node_modules/.cache
+
 # Sincronizează cache-ul între build și project
 cp -R "$PUPPETEER_CACHE_DIR" ./node_modules/.cache/puppeteer
