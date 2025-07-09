@@ -14,7 +14,7 @@ export default function AnafDataFetcher() {
 
   async function fetchData() {
     try {
-      const response = await fetch("http://localhost:8080/anaf", {
+      const response = await fetch(/* "http://localhost:8080/anaf" */'/anaf', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -4,8 +4,11 @@ const cors = require("cors");
 const moment = require("moment");
 const app = express();
 
+const path = require("path");
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, "funeralls", "dist")));
 
 app.post("/anaf", async (req, res) => {
   const cui = req.body.cui;
@@ -2187,6 +2190,10 @@ app.post("/generate-pdf", async (req, res) => {
   console.log(pdf);
 
   res.send(pdf);
+});
+
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.resolve(__dirname, "funeralls/dist", "index.html"));
 });
 
 app.listen(8080, () => {

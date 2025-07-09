@@ -14,13 +14,16 @@ export default function FinalPage() {
   async function handleGenerarePdf() {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(contractData),
-      });
+      const response = await fetch(
+        /* "http://localhost:8080/generate-pdf" */ "/generate-pdf",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(contractData),
+        }
+      );
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
