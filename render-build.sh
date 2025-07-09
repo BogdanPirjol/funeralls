@@ -3,7 +3,7 @@ set -o errexit
 
 # Instalări
 npm install
-cd funeralls && npm install && npm run build
+cd funeralls && npm install && npm run build && cd ..
 
 # Configurează cache-ul
 PUPPETEER_CACHE_DIR=/opt/render/.cache/puppeteer
