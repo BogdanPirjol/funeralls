@@ -8,6 +8,6 @@
   },
   "scripts": {
     "dev": "nodemon app.js",
-    "prod": "node app.js"
+    "prod": "npm i && cd funeralls; npm i; npm run build && cd ..; node app.js"
   }
 }
